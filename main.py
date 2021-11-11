@@ -10,8 +10,28 @@ URL = "https://api.groupme.com/v3/"
 
 endpoints = ["groups", "chats", "direct_messages", "bots", "users", "blocks"]
 
-PAGE = 0
+PAGE = 1
 
+def mapGroupsWithIDs():
+    PARAMS = {"token": ACCESS_TOKEN,
+              "page": PAGE,
+              "per_page": 100}
+
+    requestURL = URL + "groups"
+
+    response = requests.get(url=requestURL, params=PARAMS)
+
+    data = json.dumps(response.json(), indent=3)
+
+    data = json.loads(data)
+
+    df = pd.DataFrame.from_dict(data['response'])
+
+    df = df[['name', 'group_id']]
+
+    groupIDMapping = dict(zip(df.name, df.group_id))
+
+    return groupIDMapping
 
 def getTopTenLikes(period, groupID):
     PARAMS = {"period": period,
@@ -41,6 +61,7 @@ def getTopTenLikes(period, groupID):
 
 def main():
     getTopTenLikes("month", groupID)
+    mapGroupsWithIDs()
 
 
 main()
