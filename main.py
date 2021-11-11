@@ -58,10 +58,30 @@ def getTopTenLikes(period, groupID):
 
     return df[['name', 'likes']]
 
+def getMessages(groupID):
+    PARAMS = {"token": ACCESS_TOKEN,
+              "limit": 100}
+
+    requestURL = URL + f"groups/{groupID}/messages"
+
+    response = requests.get(url=requestURL, params=PARAMS)
+
+    data = json.dumps(response.json(), indent=3)
+    # print(data)
+
+    data = json.loads(data)
+
+    df = pd.DataFrame.from_dict(data['response']['messages'])
+
+    df = df[['name', 'user_id', 'id']]
+    lastID = df['id'].iloc[-1]
+    
+
 
 def main():
-    getTopTenLikes("month", groupID)
-    mapGroupsWithIDs()
+    # getTopTenLikes("month", groupID)
+    # mapGroupsWithIDs()
+    getMessages(groupID)
 
 
 main()
