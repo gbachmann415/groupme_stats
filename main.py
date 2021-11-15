@@ -1,6 +1,7 @@
 import requests
 import json
 import pandas as pd
+from pandasgui import show
 from config.credentials import ACCESS_TOKEN, groupID
 
 pd.set_option('display.width', 1000)
@@ -13,7 +14,7 @@ endpoints = ["groups", "chats", "direct_messages", "bots", "users", "blocks"]
 
 PAGE = 1
 
-def mapGroupsWithIDs():
+def map_groups_with_ids():
     PARAMS = {"token": ACCESS_TOKEN,
               "page": PAGE,
               "per_page": 100}
@@ -34,7 +35,7 @@ def mapGroupsWithIDs():
 
     return group_id_mapping
 
-def getTopTenLikes(period, groupID):
+def get_top_ten_likes(period, groupID):
     PARAMS = {"period": period,
               "token": ACCESS_TOKEN}
 
@@ -61,7 +62,7 @@ def getTopTenLikes(period, groupID):
 
     return df[['created_at', 'name', 'likes', 'text', 'attachments']]
 
-def getMessages(groupID, lastID=None):
+def get_messages(groupID, lastID=None):
     PARAMS = {"token": ACCESS_TOKEN,
               "limit": 100,
               "before_id": lastID}
@@ -134,11 +135,12 @@ def organize_attachments(df):
     return df
 
 def main():
-    top_ten = getTopTenLikes("month", groupID)
+    top_ten = get_top_ten_likes("month", groupID)
     top_ten = organize_attachments(top_ten)
-    # group_id_mapping = mapGroupsWithIDs()
-    # messages_df = getMessages(groupID)
+    group_id_mapping = map_groups_with_ids()
+    messages_df = get_messages(groupID)
 
+    # show(top_ten)
     # print(top_ten)
     # print('\n\n')
     # print(group_id_mapping)
