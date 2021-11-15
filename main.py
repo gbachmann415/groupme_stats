@@ -137,16 +137,10 @@ def organize_attachments(df):
 def main():
     top_ten = get_top_ten_likes("month", groupID)
     top_ten = organize_attachments(top_ten)
-    group_id_mapping = map_groups_with_ids()
+    # group_id_mapping = map_groups_with_ids()
     messages_df = get_messages(groupID)
 
-    # show(top_ten)
-    # print(top_ten)
-    # print('\n\n')
-    # print(group_id_mapping)
-    # print('\n\n')
-    # print(messages_df)
-    # print('\n\n')
+    show(top_ten, messages_df)
 
 
 main()
