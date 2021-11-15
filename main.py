@@ -116,19 +116,35 @@ def getMessages(groupID, lastID=None):
         if finalDF['name'][i] == None:
             name = user_id_mapping[finalDF['user_id'][i]]
             # print(f"user_id: {finalDF['user_id'][i]} -- name: {name}")
-            finalDF['name'][i] = name
+            # finalDF['name'][i] = name
+            finalDF.loc[i, 'name'] = name
 
     return finalDF
 
+def organize_attachments(df):
+    count = 0
+    for cell in df['attachments']:
+        cell_attachments = []
+        for j in cell:
+            if 'url' in j:
+                cell_attachments.append(j['url'])
+        df.at[count, 'attachments'] = cell_attachments
+        count += 1
+
+    return df
 
 def main():
     top_ten = getTopTenLikes("month", groupID)
+    top_ten = organize_attachments(top_ten)
     # group_id_mapping = mapGroupsWithIDs()
     # messages_df = getMessages(groupID)
 
-    print(top_ten)
+    # print(top_ten)
+    # print('\n\n')
     # print(group_id_mapping)
+    # print('\n\n')
     # print(messages_df)
+    # print('\n\n')
 
 
 main()
