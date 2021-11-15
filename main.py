@@ -3,8 +3,9 @@ import json
 import pandas as pd
 from config.credentials import ACCESS_TOKEN, groupID
 
-pd.set_option('display.max_columns', None)
-pd.set_option('display.max_rows', None)
+pd.set_option('display.width', 1000)
+pd.set_option('display.max_columns', 1000)
+pd.set_option('display.max_rows', 5000)
 
 URL = "https://api.groupme.com/v3/"
 
@@ -55,8 +56,7 @@ def getTopTenLikes(period, groupID):
         total = len(i)
         df['likes'][count] = total
         count += 1
-
-    return df[['name', 'likes']]
+    return df[['name', 'likes', 'text', 'attachments']]
 
 def getMessages(groupID, lastID=None):
     PARAMS = {"token": ACCESS_TOKEN,
@@ -120,9 +120,10 @@ def getMessages(groupID, lastID=None):
 
 
 def main():
-    # getTopTenLikes("month", groupID)
+    top_ten = getTopTenLikes("month", groupID)
+    print(top_ten)
     # mapGroupsWithIDs()
-    getMessages(groupID)
+    # getMessages(groupID)
 
 
 main()
