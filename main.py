@@ -30,9 +30,9 @@ def mapGroupsWithIDs():
 
     df = df[['name', 'group_id']]
 
-    groupIDMapping = dict(zip(df.name, df.group_id))
+    group_id_mapping = dict(zip(df.name, df.group_id))
 
-    return groupIDMapping
+    return group_id_mapping
 
 def getTopTenLikes(period, groupID):
     PARAMS = {"period": period,
@@ -48,15 +48,18 @@ def getTopTenLikes(period, groupID):
 
     df = pd.DataFrame.from_dict(data['response']['messages'])
 
-    df = df[['name', 'text', 'attachments', 'favorited_by']]
+    df = df[['name', 'text', 'attachments', 'favorited_by', 'created_at']]
     df['likes'] = None
 
     count = 0
     for i in df['favorited_by']:
         total = len(i)
-        df['likes'][count] = total
+        df.loc[count, 'likes'] = total
         count += 1
-    return df[['name', 'likes', 'text', 'attachments']]
+
+    df['created_at'] = pd.to_datetime(df['created_at'], unit='s')
+
+    return df[['created_at', 'name', 'likes', 'text', 'attachments']]
 
 def getMessages(groupID, lastID=None):
     PARAMS = {"token": ACCESS_TOKEN,
@@ -115,15 +118,17 @@ def getMessages(groupID, lastID=None):
             # print(f"user_id: {finalDF['user_id'][i]} -- name: {name}")
             finalDF['name'][i] = name
 
-    print(finalDF)
-
+    return finalDF
 
 
 def main():
     top_ten = getTopTenLikes("month", groupID)
+    # group_id_mapping = mapGroupsWithIDs()
+    # messages_df = getMessages(groupID)
+
     print(top_ten)
-    # mapGroupsWithIDs()
-    # getMessages(groupID)
+    # print(group_id_mapping)
+    # print(messages_df)
 
 
 main()
