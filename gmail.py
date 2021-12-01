@@ -153,6 +153,17 @@ def create_message_with_df_in_body(sender, to, subject, message_text, df):
         border: 1px solid black;
         border-collapse: collapse;
     }
+    tr:hover {background-color: yellow;}
+    th {
+        text-align: center;
+        background-color: #04AA6D;
+        color: white;
+        padding: 10px
+    }
+    td {
+        text-align: center;
+        padding: 10px
+    }
 """
 
     html = """<html>
