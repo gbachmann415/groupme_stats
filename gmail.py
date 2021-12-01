@@ -14,14 +14,42 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import base64
-import requests
 import os.path
+
+from config.credentials import GMAIL_SENDER, GMAIL_TO
 
 # Save the path of the current working directory as a string
 cwd = str(os.getcwd())
 
+# Gmail Credentials
+gmail_client_secret = cwd + r'\config\client_secret.json'
+
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
+
+
+def initialize_gmail(gmail_creds):
+    creds = None
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(gmail_creds, SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
+
+    service = build('gmail', 'v1', credentials=creds)
+
+    return service
+
 
 def create_message(sender, to, subject, message_text):
     """Create a message for an email.
@@ -39,7 +67,10 @@ def create_message(sender, to, subject, message_text):
     message['to'] = to
     message['from'] = sender
     message['subject'] = subject
-    return {'raw': base64.urlsafe_b64encode(message.as_string())}
+
+    raw = base64.urlsafe_b64encode(message.as_bytes())
+
+    return {'raw': raw.decode()}
 
 
 def create_message_with_attachment(sender, to, subject, message_text, file):
@@ -65,6 +96,7 @@ def create_message_with_attachment(sender, to, subject, message_text, file):
 
     content_type, encoding = mimetypes.guess_type(file)
 
+    main_type = None
     if content_type is None or encoding is not None:
         content_type = 'application/octet-stream'
         main_type, sub_type = content_type.split('/', 1)
@@ -89,7 +121,9 @@ def create_message_with_attachment(sender, to, subject, message_text, file):
         msg.add_header('Content-Disposition', 'attachment', filename=filename)
         message.attach(msg)
 
-    return {'raw': base64.urlsafe_b64encode(message.as_string())}
+    raw = base64.urlsafe_b64encode(message.as_bytes())
+
+    return {'raw': raw.decode()}
 
 
 def send_message(service, user_id, message):
@@ -104,21 +138,22 @@ def send_message(service, user_id, message):
     Returns:
     Sent Message.
     """
-    try:
-        message = (service.users().messages().send(userId=user_id, body=message).execute())
-        print('Message Id: %s' % message['id'])
-        return message
-    except requests.HttpError as error:
-        print('An error occurred: %s' % error)
+    message = (service.users().messages().send(userId=user_id, body=message).execute())
+    print('Message Id: %s' % message['id'])
+    return message
 
 
 def test():
-    sender = ""
-    to = ""
-    subject = ""
-    message = ""
+    # Create a connection in order to interact with Gmail
+    service = initialize_gmail(gmail_client_secret)
 
-    raw = create_message(sender, to, subject, message)
+    subject = "TEST: GroupMe Statistics"
+    message_text = "This is a test email for the GroupMe Statistics project."
+
+    gmail_message = create_message(GMAIL_SENDER, GMAIL_TO, subject, message_text)
+
+    sent = send_message(service=service, user_id=GMAIL_SENDER, message=gmail_message)
+    print(sent)
 
     return
 
