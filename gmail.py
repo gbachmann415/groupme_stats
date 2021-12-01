@@ -18,6 +18,10 @@ import os.path
 
 from config.credentials import GMAIL_SENDER, GMAIL_TO
 
+
+
+from main import *
+
 # Save the path of the current working directory as a string
 cwd = str(os.getcwd())
 
@@ -138,6 +142,41 @@ def create_message_with_attachment(sender, to, subject, message_text, file):
     return {'raw': raw.decode()}
 
 
+def create_message_with_df_in_body(sender, to, subject, message_text, df):
+    message = MIMEMultipart()
+    message['to'] = to
+    message['from'] = sender
+    message['subject'] = subject
+
+    style = """
+    table {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+"""
+
+    html = """<html>
+<head>
+<style>{css}</style>
+</head>
+<body>
+    <h1>{header}</h1>
+    <p>
+        {message}
+    </p>
+    {html_df}
+</body>
+</html>
+    """.format(message=message_text, header="GroupMe Statistics", html_df=df.to_html(), css=style)
+    print(html)
+    html = MIMEText(html, 'html')
+    message.attach(html)
+
+    raw = base64.urlsafe_b64encode(message.as_bytes())
+
+    return {'raw': raw.decode()}
+
+
 def send_message(service, user_id, message):
     """Send an email message.
 
@@ -156,17 +195,21 @@ def send_message(service, user_id, message):
 
 
 def test():
+    top_ten = get_top_ten_likes("month", groupID)
+    top_ten = organize_attachments(top_ten)
+
     # Create a connection in order to interact with Gmail
     service = initialize_gmail(gmail_client_secret)
 
     subject = "TEST: GroupMe Statistics"
     message_text = "This is a test email for the GroupMe Statistics project."
-    file = r"C:\Users\gbach\Downloads\domain-model.png"
+    # file = r"C:\Users\gbach\Downloads\domain-model.png"
 
     # gmail_message = create_message(GMAIL_SENDER, GMAIL_TO, subject, message_text)
-    gmail_message_with_attachment = create_message_with_attachment(GMAIL_SENDER, GMAIL_TO, subject, message_text, file)
+    # gmail_message_with_attachment = create_message_with_attachment(GMAIL_SENDER, GMAIL_TO, subject, message_text, file)
+    gmail_message_with_df = create_message_with_df_in_body(GMAIL_SENDER, GMAIL_TO, subject, message_text, top_ten)
 
-    sent = send_message(service=service, user_id=GMAIL_SENDER, message=gmail_message_with_attachment)
+    sent = send_message(service=service, user_id=GMAIL_SENDER, message=gmail_message_with_df)
     print(sent)
 
     return

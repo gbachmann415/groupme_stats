@@ -3,13 +3,10 @@ Author: Gunnar Bachmann
 
 Program that uses the GroupMe API to extract and manipulate data in order to produce various statistics.
 """
-
 import requests
 import json
 import pandas as pd
 from pandasgui import show
-
-
 
 from config.credentials import ACCESS_TOKEN, groupID, GMAIL_SENDER, GMAIL_TO
 
@@ -159,22 +156,25 @@ def organize_attachments(df):
 
     return df
 
+# TODO create a function that cleans a dataframe (like capitalizing column titles) for email
 
 """
 Main method
 """
 def main():
-    # # Call function to get top ten most liked messages
-    # top_ten = get_top_ten_likes("month", groupID)
-    # # Organize the attachments column in the top_ten dataframe
-    # top_ten = organize_attachments(top_ten)
-    #
+    # Call function to get top ten most liked messages
+    top_ten = get_top_ten_likes("month", groupID)
+    # Organize the attachments column in the top_ten dataframe
+    top_ten = organize_attachments(top_ten)
+
+    print(top_ten)
+
     # # Get mapping for each group and their IDs
     # group_id_mapping = map_groups_with_ids()
-    #
+
     # # Get total message count for each user within a group
     # messages_df = get_messages(groupID)
-    #
+
     # # Ask the user if they would like to launch the pandas GUI
     # show_gui = input("Do you want to open the messages data in a GUI? [yes] ")
     # if show_gui == 'yes':
@@ -183,4 +183,4 @@ def main():
     return
 
 
-main()
+# main()
