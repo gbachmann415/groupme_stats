@@ -16,3 +16,8 @@
 - GCP
 - Gmail API
 - GroupMe API
+
+### Setup
+
+- Add path to gmail credentials in gmail.py
+- Confirm credentials are imported correctly
