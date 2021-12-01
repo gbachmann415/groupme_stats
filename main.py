@@ -11,7 +11,7 @@ from pandasgui import show
 
 
 
-from config.credentials import ACCESS_TOKEN, groupID
+from config.credentials import ACCESS_TOKEN, groupID, GMAIL_SENDER, GMAIL_TO
 
 pd.set_option('display.width', 1000)
 pd.set_option('display.max_columns', 1000)
