@@ -96,22 +96,34 @@ def create_message_with_attachment(sender, to, subject, message_text, file):
 
     content_type, encoding = mimetypes.guess_type(file)
 
-    main_type = None
+
     if content_type is None or encoding is not None:
         content_type = 'application/octet-stream'
         main_type, sub_type = content_type.split('/', 1)
+    else:
+        main_type, sub_type = content_type.split('/', 1)
+
     if main_type == 'text':
         fp = open(file, 'rb')
         msg = MIMEText(fp.read(), _subtype=sub_type)
         fp.close()
+        filename = os.path.basename(file)
+        msg.add_header('Content-Disposition', 'attachment', filename=filename)
+        message.attach(msg)
     elif main_type == 'image':
         fp = open(file, 'rb')
         msg = MIMEImage(fp.read(), _subtype=sub_type)
         fp.close()
+        filename = os.path.basename(file)
+        msg.add_header('Content-Disposition', 'attachment', filename=filename)
+        message.attach(msg)
     elif main_type == 'audio':
         fp = open(file, 'rb')
         msg = MIMEAudio(fp.read(), _subtype=sub_type)
         fp.close()
+        filename = os.path.basename(file)
+        msg.add_header('Content-Disposition', 'attachment', filename=filename)
+        message.attach(msg)
     else:
         fp = open(file, 'rb')
         msg = MIMEBase(main_type, sub_type)
@@ -149,10 +161,12 @@ def test():
 
     subject = "TEST: GroupMe Statistics"
     message_text = "This is a test email for the GroupMe Statistics project."
+    file = r"C:\Users\gbach\Downloads\domain-model.png"
 
-    gmail_message = create_message(GMAIL_SENDER, GMAIL_TO, subject, message_text)
+    # gmail_message = create_message(GMAIL_SENDER, GMAIL_TO, subject, message_text)
+    gmail_message_with_attachment = create_message_with_attachment(GMAIL_SENDER, GMAIL_TO, subject, message_text, file)
 
-    sent = send_message(service=service, user_id=GMAIL_SENDER, message=gmail_message)
+    sent = send_message(service=service, user_id=GMAIL_SENDER, message=gmail_message_with_attachment)
     print(sent)
 
     return
