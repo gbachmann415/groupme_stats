@@ -14,6 +14,9 @@ endpoints = ["groups", "chats", "direct_messages", "bots", "users", "blocks"]
 
 PAGE = 1
 
+"""
+Return a dataframe of all groups with their title and group ID
+"""
 def map_groups_with_ids():
     PARAMS = {"token": ACCESS_TOKEN,
               "page": PAGE,
@@ -35,6 +38,11 @@ def map_groups_with_ids():
 
     return group_id_mapping
 
+
+"""
+Given a period (day, week, month) and a group ID, return a dataframe of the top ten most liked messages.
+Dataframe includes: date, users name, likes, text, attachments.
+"""
 def get_top_ten_likes(period, groupID):
     PARAMS = {"period": period,
               "token": ACCESS_TOKEN}
@@ -62,6 +70,10 @@ def get_top_ten_likes(period, groupID):
 
     return df[['created_at', 'name', 'likes', 'text', 'attachments']]
 
+
+"""
+Return a dataframe of the total message count within a group for each user.
+"""
 def get_messages(groupID, lastID=None):
     PARAMS = {"token": ACCESS_TOKEN,
               "limit": 100,
@@ -122,6 +134,10 @@ def get_messages(groupID, lastID=None):
 
     return finalDF
 
+
+"""
+Organize and clean the attachments column in a Dataframe.
+"""
 def organize_attachments(df):
     count = 0
     for cell in df['attachments']:
@@ -134,13 +150,22 @@ def organize_attachments(df):
 
     return df
 
-def main():
-    top_ten = get_top_ten_likes("month", groupID)
-    top_ten = organize_attachments(top_ten)
-    # group_id_mapping = map_groups_with_ids()
-    messages_df = get_messages(groupID)
 
-    show(top_ten, messages_df)
+"""
+Main method
+"""
+def main():
+    # top_ten = get_top_ten_likes("month", groupID)
+    # top_ten = organize_attachments(top_ten)
+    # group_id_mapping = map_groups_with_ids()
+    # messages_df = get_messages(groupID)
+    #
+    # show_gui = input("Do you want to open the messages data in a GUI? [yes] ")
+    # if show_gui == 'yes':
+    #     show(top_ten, messages_df)
+
+    return
+
 
 
 main()
