@@ -1,7 +1,16 @@
+"""
+Author: Gunnar Bachmann
+
+Program that uses the GroupMe API to extract and manipulate data in order to produce various statistics.
+"""
+
 import requests
 import json
 import pandas as pd
 from pandasgui import show
+
+
+
 from config.credentials import ACCESS_TOKEN, groupID
 
 pd.set_option('display.width', 1000)
